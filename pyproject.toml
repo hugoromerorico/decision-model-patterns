@@ -1,0 +1,11 @@
+[project]
+name = "decision-model-patterns"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "langchain[openai]>=1.4.3",
+    "langgraph>=1.2.12",
+    "langgraph-cli[inmem]>=0.4.32",
+]
