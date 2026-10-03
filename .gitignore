@@ -12,3 +12,6 @@ wheels/
 # Skills
 .agents/
 .claude/
+
+# Langgraph checkpoints
+*.pckl
