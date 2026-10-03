@@ -1,6 +1,8 @@
 from typing import Literal, cast
 
+from dotenv import load_dotenv
 from langchain.messages import AIMessage
+from langchain_typesafe import Choice, Noul, Score, TypeSafeClassifier
 from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import Command
@@ -58,6 +60,38 @@ def main():
     ]:
         result = graph.invoke({"request": request})
         print(f"{request} -> {result['result']}")
+
+def verify_typesafe():
+    load_dotenv()
+
+    classifier = TypeSafeClassifier()
+
+    response = classifier.invoke(
+        {
+            "state": (
+                "The deploy failed twice and customers are seeing 500s. "
+                "Can someone look now?"
+            ),
+            "questions": {
+                "urgent": Noul(instructions="Does this need attention right now?"),
+                "team": Choice(
+                    instructions="Which team should pick this up?",
+                    criteria={
+                        "infra": "Deploys, availability, and on-call incidents.",
+                        "billing": "Payments, invoices, and subscriptions.",
+                    },
+                ),
+                "severity": Score(
+                    instructions="How severe is the impact?",
+                    criteria=["Cosmetic.", "Degraded for some users.", "Full outage."],
+                ),
+            },
+        }
+    )
+
+    print(response.nouls["urgent"].noul)
+    print(response.choices["team"].choice, response.choices["team"].confidence)
+    print(response.scores["severity"].score)
 
 
 if __name__ == "__main__":
