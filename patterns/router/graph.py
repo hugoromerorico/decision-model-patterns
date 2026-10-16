@@ -30,7 +30,7 @@ PRIORITY = Choice(
 )
 
 
-def decide(state: State) -> Command[Priority]:
+def decide_decision_model(state: State) -> Command[Priority]:
     response = classifier.invoke(
         {"state": state["request"], "questions": {"priority": PRIORITY}}
     )
@@ -52,11 +52,11 @@ def low(state: State) -> dict:
 
 graph = (
     StateGraph(State)
-    .add_node(decide)
+    .add_node(decide_decision_model)
     .add_node(high)
     .add_node(mid)
     .add_node(low)
-    .add_edge(START, "decide")
+    .add_edge(START, "decide_decision_model")
     .add_edge("high", END)
     .add_edge("mid", END)
     .add_edge("low", END)

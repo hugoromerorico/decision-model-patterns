@@ -11,3 +11,7 @@ tasks:
   router:
     desc: Run the router pattern
     cmd: uv run patterns/router/graph.py
+
+  rerank:
+    desc: Run the rerank pattern
+    cmd: uv run patterns/rerank/graph.py

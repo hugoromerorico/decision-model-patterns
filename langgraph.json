@@ -1,7 +1,8 @@
 {
   "dependencies": ["."],
   "graphs": {
-    "router": "./patterns/router/graph.py:graph"
+    "router": "./patterns/router/graph.py:graph",
+    "rerank": "./patterns/rerank/graph.py:graph"
   },
   "env": ".env",
   "python_version": "3.13"

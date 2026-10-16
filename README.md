@@ -16,7 +16,7 @@ When an LLM call exists only to produce a decision (route here, flag this, rate 
 |---|---|
 | [Router](#router) | ✅ |
 | Evals | Planned |
-| Rerank | Planned |
+| [Rerank](#rerank) | ✅ |
 | Trigger | Planned |
 | Tool-call protection | Planned |
 | Email triage | Planned |
@@ -32,6 +32,12 @@ When an LLM call exists only to produce a decision (route here, flag this, rate 
 
 The `decide` node asks one `Choice` question: how urgent is the request (`high`, `mid` or `low`)? It then jumps to the matching branch with `Command(goto=...)`. No prompt and no output parsing are involved, because the answer is already one of the branch names.
 
+### Rerank
+
+[`patterns/rerank/graph.py`](patterns/rerank/graph.py)
+
+The second stage of a RAG pipeline. `retrieve` fetches the top 5 documents (a keyword-overlap stand-in for your vector store), then `rerank` sends one request with a `Score` question per document: how well does this passage answer the query, on a four-level rubric. The documents are sorted by expected score and returned in `reranked`, ready to pass to the generator.
+
 ## Getting started
 
 The examples run against [Decision Sandbox](https://decision-sandbox.gutan.dev), a free mock of the TypeSafe API. It returns **synthetic, random answers**, so you can explore the patterns without a model or a paid key. Expect the routing to look arbitrary.
@@ -43,6 +49,7 @@ cp .env.example .env
 uv sync
 
 task router   # or: uv run patterns/router/graph.py
+task rerank   # or: uv run patterns/rerank/graph.py
 task dev      # or: uv run langgraph dev   (opens LangGraph Studio)
 ```
 
