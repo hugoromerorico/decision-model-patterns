@@ -15,3 +15,9 @@ wheels/
 
 # Langgraph checkpoints
 *.pckl
+
+# Environment
+.env
+
+# LangGraph dev server
+.langgraph_api/

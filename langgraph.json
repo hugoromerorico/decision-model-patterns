@@ -1,7 +1,8 @@
 {
   "dependencies": ["."],
   "graphs": {
-    "agent": "./main.py:graph"
+    "router": "./patterns/router/graph.py:graph"
   },
+  "env": ".env",
   "python_version": "3.13"
 }

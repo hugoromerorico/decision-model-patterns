@@ -1,48 +1,54 @@
 # Decision Model Patterns
 
-System one can be useful
+Patterns for using **decision models** inside [LangGraph](https://langchain-ai.github.io/langgraph/) agents.
 
-Patterns that can work:
-# evals, rerank rag, confidence threshold, tool-call-protection, email-triage, labeling, guardrailing pre-LLM, jailbreak-protection
-[X] Router
-[] Evals
-[] Rerank
-[] Trigger
-[] Tool-call-protection
-[] Email triage
-[] Labeling
-[] Guardrailing
-[] LLM Security
+A decision model answers typed questions about some input and returns probabilities instead of text:
 
-## Fake System-1 classifier
+- **Noul**: a yes/no question. Returns the probability of yes.
+- **Choice**: picks one option. Returns the chosen option, the full distribution and a confidence.
+- **Score**: grades against an ordered rubric. Returns an expected value and a confidence.
 
-`fake_typesafe.py` is a stand-in for `langchain_typesafe.TypeSafeClassifier`, so you can build and test patterns without an API key. It answers every question with random probabilities in the same shape as the real API. Pass a `seed` to get the same answers on every run. It's a LangChain `Runnable`, so `invoke`, `batch` and `|` all work.
+When an LLM call exists only to produce a decision (route here, flag this, rate that), a decision model is faster, cheaper and returns typed output you can branch on directly. In every pattern here, the decision model is a **node** in the graph, called through [`langchain-typesafe`](https://pypi.org/project/langchain-typesafe/).
 
-```python
-from fake_typesafe import Choice, FakeTypeSafeClassifier, Noul, Score
+## Patterns
 
-classifier = FakeTypeSafeClassifier(seed=7)
+| Pattern | Status |
+|---|---|
+| [Router](#router) | ✅ |
+| Evals | Planned |
+| Rerank | Planned |
+| Trigger | Planned |
+| Tool-call protection | Planned |
+| Email triage | Planned |
+| Labeling | Planned |
+| Guardrailing | Planned |
+| LLM security | Planned |
 
-response = classifier.invoke(
-    {
-        "state": "The deploy failed twice and customers are seeing 500s.",
-        "questions": {
-            "urgent": Noul(instructions="Does this need attention right now?"),
-            "team": Choice(
-                instructions="Which team should pick this up?",
-                criteria={"infra": "Deploys and incidents.", "billing": "Payments."},
-            ),
-            "severity": Score(
-                instructions="How severe is the impact?",
-                criteria=["Cosmetic.", "Degraded.", "Full outage."],
-            ),
-        },
-    }
-)
+### Router
 
-response.nouls["urgent"].noul  # 0.324, probability of yes
-response.choices["team"].choice  # "billing", the most likely option (0.812)
-response.scores["severity"].score  # 1.3, the weighted average of levels
+[`patterns/router/graph.py`](patterns/router/graph.py)
+
+<!-- Add the LangGraph Studio screenshot here: ![Router graph](patterns/router/graph.png) -->
+
+The `decide` node asks one `Choice` question: how urgent is the request (`high`, `mid` or `low`)? It then jumps to the matching branch with `Command(goto=...)`. No prompt and no output parsing are involved, because the answer is already one of the branch names.
+
+## Getting started
+
+The examples run against [Decision Sandbox](https://decision-sandbox.gutan.dev), a free mock of the TypeSafe API. It returns **synthetic, random answers**, so you can explore the patterns without a model or a paid key. Expect the routing to look arbitrary.
+
+Requires [uv](https://docs.astral.sh/uv/). [Task](https://taskfile.dev/) is optional.
+
+```sh
+cp .env.example .env
+uv sync
+
+task router   # or: uv run patterns/router/graph.py
+task dev      # or: uv run langgraph dev   (opens LangGraph Studio)
 ```
 
-The rules follow the [API spec](https://api.typesafe.ai/openapi.json): probabilities sum to about 1, `choice` is the most likely option, `score` is the probability-weighted average of the levels, and `confidence` is the top probability.
+To use a real model, point `.env` at TypeSafe:
+
+```sh
+TYPESAFE_BASE_URL=https://api.typesafe.ai
+TYPESAFE_API_KEY=<your key>
+```

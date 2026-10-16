@@ -1,11 +1,13 @@
 version: "3"
 
-
 tasks:
   default:
     cmd: task --list
 
   dev:
-    desc: Run env server
-    cmds:
-      - uv run langgraph dev
+    desc: Open the graphs in LangGraph Studio
+    cmd: uv run langgraph dev
+
+  router:
+    desc: Run the router pattern
+    cmd: uv run patterns/router/graph.py

@@ -1,12 +1,11 @@
 [project]
 name = "decision-model-patterns"
 version = "0.1.0"
-description = "Add your description here"
+description = "Decision model patterns as LangGraph nodes"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "langchain-typesafe>=0.0.1a3",
-    "langchain[openai]>=1.4.3",
     "langgraph>=1.2.12",
     "langgraph-cli[inmem]>=0.4.32",
     "python-dotenv>=1.2.4",
